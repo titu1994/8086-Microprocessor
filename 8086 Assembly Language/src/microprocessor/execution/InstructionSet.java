@@ -74,5 +74,31 @@ public class InstructionSet {
 		return i;
 	}
 	
+	/**
+	 * MOV AX,BX
+	 * @param dest
+	 * @param src
+	 * @return
+	 */
+	public synchronized Instruction MOV(ExtendedRegister dest, ExtendedRegister src) {
+		Instruction i = new Instruction("MOV", () -> {
+			dest.setVal(src.getVal());
+		});
+		return i;
+	}
+	
+	/**
+	 * MOV AX,BL
+	 * @param dest
+	 * @param src
+	 * @return
+	 */
+	public synchronized Instruction MOV(ExtendedRegister dest, GeneralRegister src) {
+		Instruction i = new Instruction("MOV", () -> {
+			dest.setVal(src.getVal());
+		});
+		return i;
+	}
+	
 	
 }
