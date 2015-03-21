@@ -1,12 +1,15 @@
 package microprocessor.memory;
 
+import microprocessor.execution.ExtendedRegister;
 import microprocessor.execution.IndexRegister;
 
 public class MemoryManagementUnit {
 	private static final MemoryManagementUnit mmu = new MemoryManagementUnit();
 	private static Memory memory;
+	private static StackMemory stack;
+	private static IdentifierMemory id;
 
-	private MemoryManagementUnit() {memory = Memory.getMemory();}
+	private MemoryManagementUnit() {memory = Memory.getMemory(); stack = StackMemory.getStack(); id = IdentifierMemory.getIDMemory();}
 
 	public synchronized static MemoryManagementUnit getMMU() {
 		return mmu;
@@ -206,6 +209,50 @@ public class MemoryManagementUnit {
 	public synchronized int getWordAtAddress(SegmentRegister segmentRegs, IndexRegister indexRegs, IndexRegister baseOffset, byte logicalOffset) {
 		int phyAddress = getPhysicalAddress(segmentRegs, indexRegs, baseOffset, logicalOffset);
 		return memory.getWord(phyAddress);	
+	}
+	
+	
+	
+	
+	
+	
+	
+	public synchronized void pushStack(ExtendedRegister ex) {
+		stack.push(ex.getVal());
+	}
+	
+	public synchronized void pushStack(IndexRegister ix) {
+		stack.push(ix.getVal());
+	}
+	
+	public synchronized void popStack(ExtendedRegister ex) {
+		ex.setVal(stack.pop());
+	}
+	
+	public synchronized void popStack(IndexRegister ix) {
+		ix.setVal(stack.pop());
+	}
+	
+	
+	
+	
+	
+	
+	
+	public synchronized void putIdentifierWord(String iden, int data) {
+		id.putWord(iden, data);
+	}
+	
+	public synchronized void putIdentifierDoubleWord(String iden, int data[]) {
+		id.putDoubleWord(iden, data);
+	}
+	
+	public synchronized int getIdentifierWord(String iden) {
+		return id.getWord(iden);
+	}
+	
+	public synchronized int[] getIdentifierDoubleWord(String iden) {
+		return id.getDoubleWord(iden);
 	}
 	
 }
