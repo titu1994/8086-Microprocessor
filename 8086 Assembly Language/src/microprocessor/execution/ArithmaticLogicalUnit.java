@@ -16,6 +16,9 @@ public class ArithmaticLogicalUnit {
 		return alu;
 	}
 
+	/**
+	 * Loads AH register with the lower byte of Flag Register
+	 */
 	public synchronized void loadAHWithFlags() {
 		byte x = 0;
 		x =(byte) ((byte) (FlagRegister.SF.getVal() << 8) |
@@ -30,6 +33,9 @@ public class ArithmaticLogicalUnit {
 		GeneralRegister.AH.setVal(x);
 	}
 
+	/**
+	 * Loads the flag register from the values in the AH register
+	 */
 	public synchronized void storeAHWithFlags() {
 		byte x = GeneralRegister.AH.getVal();
 		FlagRegister.SF.setVal(x >> 8);
@@ -39,6 +45,9 @@ public class ArithmaticLogicalUnit {
 		FlagRegister.CF.setVal(x >> 1);
 	}
 
+	/**
+	 * Push flag word onto stack.
+	 */
 	public synchronized void pushFlagsOntoStack() {
 		byte x = 0;
 		x =(byte) ((byte) (FlagRegister.SF.getVal() << 8) |
@@ -54,6 +63,9 @@ public class ArithmaticLogicalUnit {
 		MemoryManagementUnit.getMMU().pushStack(y);
 	}
 
+	/**
+	 * Pops the Flag Word from the stack and loads the registers.
+	 */
 	public synchronized void popFlagFromStack() {
 		int x = MemoryManagementUnit.getMMU().popStack();
 		FlagRegister.SF.setVal(x >> 8);
@@ -63,6 +75,9 @@ public class ArithmaticLogicalUnit {
 		FlagRegister.CF.setVal(x >> 1);
 	}
 
+	/**
+	 * Temporarily loads the flag register values onto the temporary variables
+	 */
 	private synchronized void tempReadFlagsBeforeOp() {
 		PF = FlagRegister.PF.getVal();
 		ZF = FlagRegister.ZF.getVal(); 
@@ -75,7 +90,9 @@ public class ArithmaticLogicalUnit {
 		//DF = FlagRegister.DF.getVal();
 	}
 
-
+	/**
+	 * Writes the frag variable values onto the actual flag word
+	 */
 	private synchronized void tempWriteFlagsAfterOp() {
 		FlagRegister.PF.setVal(PF);
 		FlagRegister.ZF.setVal(ZF); 
@@ -88,6 +105,14 @@ public class ArithmaticLogicalUnit {
 		//FlagRegister.DF.setVal(DF);
 	}
 
+	/**
+	 * Calculates 4 flags 
+	 * - PF
+	 * - ZF
+	 * - SF
+	 * - OF
+	 * @param result
+	 */
 	private synchronized void tempCalculateFlagsDuringOp(int result) {
 		//PF Analysis
 		int count = 0, n = result;
@@ -107,6 +132,14 @@ public class ArithmaticLogicalUnit {
 		if(result >= 32767 || result <= -32768) OF = 1; else OF = 0;
 	}
 
+	/**
+	 * Calculates 2 additional flags needed for comparisons :
+	 * - AF
+	 * - CF
+	 * @param a
+	 * @param b
+	 * @param op
+	 */
 	private synchronized void tempCalculateCarryFlagsDuringOp(int a, int b, int op) {
 
 		switch(op) {
@@ -135,6 +168,13 @@ public class ArithmaticLogicalUnit {
 		}
 	}
 
+	/**
+	 * Helper method that calculates the values for all 6 important flags and stores the result of calculation
+	 * @param a
+	 * @param b
+	 * @param result
+	 * @param op
+	 */
 	private synchronized void tempCalculateAllFlagsDuringOpInt(int a, int b, int result, int op) {
 		tempReadFlagsBeforeOp();
 		tempCalculateFlagsDuringOp(result);
@@ -148,7 +188,12 @@ public class ArithmaticLogicalUnit {
 
 
 
-
+	/**
+	 * General Add Instructions
+	 * ADD al,bl
+	 * @param al
+	 * @param bl
+	 */
 	public synchronized void add(GeneralRegister al, GeneralRegister bl) {
 		byte x = (byte) (al.getVal() + bl.getVal());
 		tempCalculateAllFlagsDuringOpInt(al.getVal(), bl.getVal(), x, 1);
@@ -202,9 +247,34 @@ public class ArithmaticLogicalUnit {
 		}
 		else MemoryManagementUnit.getMMU().putDataAtAddress(SegmentRegister.DS, memoryLocation, x);
 	}
+	
+	public synchronized void adc(GeneralRegister al, GeneralRegister bl) {
+		byte x = (byte) (al.getVal() + bl.getVal() + FlagRegister.CF.getVal());
+		tempCalculateAllFlagsDuringOpInt(al.getVal(), bl.getVal()+ FlagRegister.CF.getVal(), x, 1);
+		if(SF == 1) {
+			int y = al.getVal() + bl.getVal() + FlagRegister.CF.getVal();
+			ExtendedRegister.AX.setVal(y);
+		}
+		else al.setVal(x);
+	}
+	
+	/**
+	 * Atomic Increment Operation
+	 * @param al
+	 */
+	public synchronized void inc(GeneralRegister al) {
+		int carryFlagVal = FlagRegister.CF.getVal();
+		int alPrevVal = al.getVal();
+		al.setVal((byte) (al.getVal()+1));
+		tempCalculateAllFlagsDuringOpInt(alPrevVal, 1, alPrevVal + 1, 1);
+		FlagRegister.CF.setVal(carryFlagVal);
+	}
 
 
 
+	
+	
+	
 
 
 	public synchronized void add(ExtendedRegister al, ExtendedRegister bl) {
@@ -239,6 +309,69 @@ public class ArithmaticLogicalUnit {
 		tempCalculateAllFlagsDuringOpInt(immediate, dat, x, 1);
 		MemoryManagementUnit.getMMU().putWordAtAddress(SegmentRegister.DS, memoryLocation, x);
 	}
+	
+	public synchronized void adc(ExtendedRegister al, ExtendedRegister bl) {
+		int x = (al.getVal() + bl.getVal() + FlagRegister.CF.getVal());
+		tempCalculateAllFlagsDuringOpInt(al.getVal(), bl.getVal() + FlagRegister.CF.getVal(), x, 1);
+		al.setVal(x);
+	}
+	
+	/**
+	 * Atomic Increment Operation
+	 * @param al
+	 */
+	public synchronized void inc(ExtendedRegister al) {
+		int carryFlagVal = FlagRegister.CF.getVal();
+		int alPrevVal = al.getVal();
+		al.setVal(al.getVal() + 1);
+		tempCalculateAllFlagsDuringOpInt(alPrevVal, 1, alPrevVal + 1, 1);
+		FlagRegister.CF.setVal(carryFlagVal);
+	}
+	
+	/**
+	 * AAA - ASCII Adjust Addition
+	 */
+	public synchronized void aaa() {
+		byte alLowNibb = (byte) (GeneralRegister.AL.getVal() & 0x0f);
+		if(alLowNibb > 9 || FlagRegister.AF.getVal() == 1) {
+			byte alVal = (byte) (GeneralRegister.AL.getVal() + 6);
+			GeneralRegister.AL.setVal((byte) (alVal & 0x0f));
+			GeneralRegister.AH.setVal((byte) (GeneralRegister.AH.getVal() + 1));
+			FlagRegister.AF.setVal(1);
+			FlagRegister.CF.setVal(1);
+		}
+		else {
+			FlagRegister.AF.setVal(0);
+			FlagRegister.CF.setVal(0);
+		}
+	}
+	
+	/**
+	 * DAA - Decimal Adjust for Addition
+	 */
+	public synchronized void daa() {
+		byte alLowNibb = (byte) (GeneralRegister.AL.getVal() & 0x0f);
+		boolean t1 = false , t2 = false;
+		if(alLowNibb > 9 || FlagRegister.AF.getVal() == 1) {
+			byte alVal = (byte) (GeneralRegister.AL.getVal() + 0x06);
+			GeneralRegister.AL.setVal((byte) (alVal & 0x0f));
+			t1 = true;
+		}
+		if(alLowNibb > 0x9F || FlagRegister.CF.getVal() == 1) {
+			byte alVal = (byte) (GeneralRegister.AL.getVal() + 0x60);
+			GeneralRegister.AL.setVal((byte) (alVal & 0x0f));
+			t2 = true;
+		}
+		
+		tempReadFlagsBeforeOp();
+		tempCalculateFlagsDuringOp(GeneralRegister.AL.getVal());
+		tempWriteFlagsAfterOp();
+		if(t1) FlagRegister.AF.setVal(1);
+		if(t2) FlagRegister.CF.setVal(1);
+	}
+	
+	
+	
 
 
 
@@ -325,7 +458,23 @@ public class ArithmaticLogicalUnit {
 		}
 	}
 
-
+	public synchronized void sbb(GeneralRegister al, GeneralRegister bl) {
+		int sf = FlagRegister.SF.getVal();
+		byte dat = (byte) (al.getVal() - bl.getVal() - FlagRegister.CF.getVal());
+		tempCalculateAllFlagsDuringOpInt(al.getVal(), bl.getVal() - FlagRegister.CF.getVal(), dat, 2);
+		FlagRegister.SF.setVal(sf);
+		al.setVal(dat);
+	}
+	
+	public synchronized void dec(GeneralRegister al) {
+		int cf = FlagRegister.CF.getVal();
+		byte val = al.getVal();
+		al.setVal((byte) (val - 1));
+		tempCalculateAllFlagsDuringOpInt(val, 1, val - 1, 2);
+		FlagRegister.CF.setVal(cf);
+	}
+	
+	
 
 
 
@@ -389,8 +538,25 @@ public class ArithmaticLogicalUnit {
 			FlagRegister.SF.setVal(0);
 		}
 	}
+	
+	public synchronized void sbb(ExtendedRegister al, ExtendedRegister bl) {
+		int sf = FlagRegister.SF.getVal();
+		int dat = (al.getVal() - bl.getVal() - FlagRegister.CF.getVal());
+		tempCalculateAllFlagsDuringOpInt(al.getVal(), bl.getVal() - FlagRegister.CF.getVal(), dat, 2);
+		FlagRegister.SF.setVal(sf);
+		al.setVal(dat);
+	}
 
-
+	public synchronized void dec(ExtendedRegister al) {
+		int cf = FlagRegister.CF.getVal();
+		int val = al.getVal();
+		al.setVal((val - 1));
+		tempCalculateAllFlagsDuringOpInt(val, 1, val - 1, 2);
+		FlagRegister.CF.setVal(cf);
+	}
+	
+	
+	
 
 
 
