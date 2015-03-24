@@ -471,4 +471,50 @@ public class InstructionSet {
 		return i;
 	}
 	
+	/**
+	 * LAFH
+	 * @return
+	 */
+	public synchronized Instruction LAHF() {
+		Instruction i = new Instruction("LAHF", () -> {
+		ArithmaticLogicalUnit.getALU().loadAHWithFlags();
+		});
+		return i;
+	}
+	
+	/**
+	 * SAHF
+	 * @return
+	 */
+	public synchronized Instruction SAHF() {
+		Instruction i = new Instruction("SAHF", () -> {
+		ArithmaticLogicalUnit.getALU().storeAHWithFlags();
+		});
+		return i;
+	}
+	
+	/**
+	 * POPF
+	 * @return
+	 */
+	public synchronized Instruction POPF() {
+		Instruction i = new Instruction("POPF", () -> {
+		ArithmaticLogicalUnit.getALU().popFlagFromStack();
+		});
+		return i;
+	}
+	
+	/**
+	 * PUSHF
+	 * @return
+	 */
+	public synchronized Instruction PUSHF() {
+		Instruction i = new Instruction("PUSHF", () -> {
+		ArithmaticLogicalUnit.getALU().pushFlagsOntoStack();
+		});
+		return i;
+	}
+	
+	
+	
 }

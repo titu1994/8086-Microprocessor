@@ -225,6 +225,10 @@ public class MemoryManagementUnit {
 		stack.push(ix.getVal());
 	}
 	
+	public synchronized void pushStack(int x) {
+		stack.push(x);
+	}
+	
 	public synchronized void popStack(ExtendedRegister ex) {
 		ex.setVal(stack.pop());
 	}
@@ -232,6 +236,11 @@ public class MemoryManagementUnit {
 	public synchronized void popStack(IndexRegister ix) {
 		ix.setVal(stack.pop());
 	}
+	
+	public synchronized int popStack() {
+		return stack.pop();
+	}
+	
 	
 	
 	

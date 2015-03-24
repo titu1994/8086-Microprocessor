@@ -1,16 +1,19 @@
 package microprocessor.execution;
 
 public enum FlagRegister {
-	PF(false), ZF(false), SF(false), AF(false), CF(false), OF(false), TF(false), IF(false), DF(false);
+	PF(0), ZF(0), SF(0), AF(0), CF(0), OF(0), TF(0), IF(0), DF(0);
 	
-	private boolean val;
-	private FlagRegister(boolean value) {
+	private int val;
+	private FlagRegister(int value) {
 		this.val = value;
 	}
-	public boolean isVal() {
+	
+	public int getVal() {
 		return val;
 	}
-	public void setVal(boolean val) {
+	
+	public void setVal(int val) {
 		this.val = val;
 	}
+	
 }
