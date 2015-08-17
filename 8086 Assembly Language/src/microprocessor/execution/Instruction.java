@@ -1,5 +1,7 @@
 package microprocessor.execution;
 
+import microprocessor.execution.register.GeneralRegister;
+
 
 public class Instruction {
 	private static int id = 0;

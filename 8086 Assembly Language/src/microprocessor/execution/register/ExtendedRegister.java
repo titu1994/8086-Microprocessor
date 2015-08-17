@@ -1,4 +1,4 @@
-package microprocessor.execution;
+package microprocessor.execution.register;
 
 public enum ExtendedRegister {
 	AX(0), BX(0), CX(0), DX(0);

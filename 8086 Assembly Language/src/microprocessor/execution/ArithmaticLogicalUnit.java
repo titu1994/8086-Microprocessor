@@ -1,7 +1,10 @@
 package microprocessor.execution;
 
+import microprocessor.execution.register.ExtendedRegister;
+import microprocessor.execution.register.FlagRegister;
+import microprocessor.execution.register.GeneralRegister;
+import microprocessor.execution.register.SegmentRegister;
 import microprocessor.memory.MemoryManagementUnit;
-import microprocessor.memory.SegmentRegister;
 import microprocessor.util.BitwiseOperations;
 
 
@@ -164,6 +167,15 @@ public class ArithmaticLogicalUnit {
 			if(a < b) CF = 1; else CF = 0;
 			break;
 		}
+		case 3: {//Multiplication
+			FlagRegister.CF.setVal(0);
+			FlagRegister.OF.setVal(0);
+			break;
+		}
+		case 4: {//Division
+			
+			break;
+		}
 		default: 
 		}
 	}
@@ -181,9 +193,22 @@ public class ArithmaticLogicalUnit {
 		tempCalculateCarryFlagsDuringOp(a, b, op);
 		tempWriteFlagsAfterOp();
 	}
+	
+	/**
+	 * Helper method to test sign of integer multiplication
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private synchronized int testSign(int x, int y) {
+		int z = x * y;
+		return (int) (z >>> 32);
+	}
 
 
-
+	/**
+	 * General Arithmatic
+	 */
 
 
 
@@ -372,12 +397,16 @@ public class ArithmaticLogicalUnit {
 	
 	
 	
-
-
-
 	
-
-
+	
+	
+	
+	
+	/**
+	 * General Subtractions
+	 * @param al
+	 * @param bl
+	 */
 
 	public synchronized void sub(GeneralRegister al, GeneralRegister bl) {
 		byte x = (byte) (al.getVal() - bl.getVal());
@@ -560,5 +589,214 @@ public class ArithmaticLogicalUnit {
 
 
 
+	
+	
+	
+	/*
+	 * General multiplication
+	 */
+	public synchronized void mul(GeneralRegister bl) {
+		byte val = bl.getVal();
+		int result = GeneralRegister.AL.getVal() * val;
+		ExtendedRegister.AX.setAX(result);
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), bl.getVal(), result, 3);
+	}
+	
+	public synchronized void mul(byte b) {
+		int result = GeneralRegister.AL.getVal() * b;
+		ExtendedRegister.AX.setAX(result);
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), b, result, 3);
+	}
+	
+	public synchronized void mul(ExtendedRegister bx) {
+		int val = bx.getVal();
+		long result = ExtendedRegister.AX.getVal() * val;
+		ExtendedRegister.DX.setDX((int) (result >>> 16));
+		ExtendedRegister.AX.setAX((int) (result & 0x00ff));
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), bx.getVal(), (int) result, 3);
+	}
+	
+	public synchronized void mul(int x) {
+		long result = ExtendedRegister.AX.getVal() * x;
+		ExtendedRegister.DX.setDX((int) (result >>> 16));
+		ExtendedRegister.AX.setAX((int) (result & 0x00ff));
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), x, (int) result, 3);
+	}
+	
+	/*
+	 * IMUL
+	 */	
+	public synchronized void imul(GeneralRegister bl) {
+		byte val = bl.getVal();
+		byte al = GeneralRegister.AL.getVal();
+		int result = al * val;
+		ExtendedRegister.AX.setAX(result);
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), bl.getVal(), result, 3);
+	}
+	
+	public synchronized void imul(byte b) {
+		int ax = GeneralRegister.AL.getVal();
+		int result = ax * b;
+		ExtendedRegister.AX.setAX(result);
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), b, result, 3);
+	}
+	
+	public synchronized void imul(ExtendedRegister bx) {
+		int val = bx.getVal();
+		long result = ExtendedRegister.AX.getVal() * val;
+		ExtendedRegister.DX.setDX((int) (result >>> 16));
+		ExtendedRegister.AX.setAX((int) (result & 0x00ff));
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), bx.getVal(), (int) result, 3);
+	}
+	
+	public synchronized void imul(int x) {
+		long result = ExtendedRegister.AX.getVal() * x;
+		ExtendedRegister.DX.setDX((int) (result >>> 16));
+		ExtendedRegister.AX.setAX((int) (result & 0x00ff));
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), x, (int) result, 3);
+	}
+	
+	/*
+	 * AAM
+	 */
+	public synchronized void aam() {
+		byte al = GeneralRegister.AL.getVal();
+		byte nAH = (byte) (al / 10);
+		byte nAL = (byte) (al % 10);
+		GeneralRegister.AH.setVal(nAH);
+		GeneralRegister.AL.setVal(nAL);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * General Division
+	 */
+	public synchronized void div(GeneralRegister bl) {
+		byte val = bl.getVal();
+		int ax = ExtendedRegister.AX.getAX();
+		GeneralRegister.AL.setVal((byte) (ax / val));
+		GeneralRegister.AH.setVal((byte) (ax % val));
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), bl.getVal(), 0, 4);
+	}
 
+	public synchronized void div(byte val) {
+		int ax = ExtendedRegister.AX.getAX();
+		GeneralRegister.AL.setVal((byte) (ax / val));
+		GeneralRegister.AH.setVal((byte) (ax % val));
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), val, 0, 4);
+	}
+	
+	public synchronized void div(ExtendedRegister bx) {
+		int val = bx.getVal();
+		int dx = ExtendedRegister.DX.getDX();
+		int ax = ExtendedRegister.AX.getAX();
+		int dxax = (dx << 16) | (ax & 0x00ff);
+		int result = dxax / val;
+		ExtendedRegister.AX.setDX(result);
+		ExtendedRegister.DX.setAX(dxax % val);
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), bx.getVal(), 0, 4);
+	}
+	
+	public synchronized void div(int x) {
+		int val = x;
+		int dx = ExtendedRegister.DX.getDX();
+		int ax = ExtendedRegister.AX.getAX();
+		int dxax = (dx << 16) | (ax & 0x00ff);
+		int result = dxax / val;
+		ExtendedRegister.AX.setDX(result);
+		ExtendedRegister.DX.setAX(dxax % val);
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), x, 0, 4);
+	}
+	
+	/*
+	 * IDIV
+	 */
+	
+	public synchronized void idiv(GeneralRegister bl) {
+		byte val = bl.getVal();
+		int ax = ExtendedRegister.AX.getAX();
+		GeneralRegister.AL.setVal((byte) (ax / val));
+		GeneralRegister.AH.setVal((byte) (ax % val));
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), bl.getVal(), 0, 4);
+	}
+
+	public synchronized void idiv(byte val) {
+		int ax = ExtendedRegister.AX.getAX();
+		GeneralRegister.AL.setVal((byte) (ax / val));
+		GeneralRegister.AH.setVal((byte) (ax % val));
+		tempCalculateAllFlagsDuringOpInt(GeneralRegister.AL.getVal(), val, 0, 4);
+	}
+	
+	public synchronized void idiv(ExtendedRegister bx) {
+		int val = bx.getVal();
+		int dx = ExtendedRegister.DX.getDX();
+		int ax = ExtendedRegister.AX.getAX();
+		int dxax = (dx << 16) | (ax & 0x00ff);
+		int result = dxax / val;
+		ExtendedRegister.AX.setDX(result);
+		ExtendedRegister.DX.setAX(dxax % val);
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), bx.getVal(), 0, 4);
+	}
+	
+	public synchronized void idiv(int x) {
+		int val = x;
+		int dx = ExtendedRegister.DX.getDX();
+		int ax = ExtendedRegister.AX.getAX();
+		int dxax = (dx << 16) | (ax & 0x00ff);
+		int result = dxax / val;
+		ExtendedRegister.AX.setDX(result);
+		ExtendedRegister.DX.setAX(dxax % val);
+		tempCalculateAllFlagsDuringOpInt(ExtendedRegister.AX.getVal(), x, 0, 4);
+	}
+	
+	
+	/**
+	 * AAD
+	 */
+	
+	public synchronized void aad() {
+		tempReadFlagsBeforeOp();
+		byte al = GeneralRegister.AL.getVal();
+		byte ah = GeneralRegister.AH.getVal();
+		al = (byte) (ah * 10 + al);
+		GeneralRegister.AL.setVal(al);
+		GeneralRegister.AH.setVal((byte) 0); 
+	}
+	
+	/*
+	 * CBW
+	 */
+	
+	public synchronized void cbw() {
+		byte al = GeneralRegister.AL.getVal();
+		if(al >> 8 == 1) {
+			GeneralRegister.AH.setVal((byte) 255);
+		}
+		else
+			GeneralRegister.AH.setVal((byte) 0);
+	}
+	
+	/*
+	 * CWD
+	 */
+	
+	public synchronized void cwd() {
+		int ax = ExtendedRegister.AX.getAX();
+		if(ax >> 16 == 1) {
+			GeneralRegister.AH.setVal((byte) 65535);
+		}
+		else
+			GeneralRegister.AH.setVal((byte) 0);
+	}
+	
+	
+	
 }

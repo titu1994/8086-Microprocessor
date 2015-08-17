@@ -3,7 +3,7 @@ package microprocessor.memory;
 import java.util.HashMap;
 import java.util.Stack;
 
-import microprocessor.execution.IndexRegister;
+import microprocessor.execution.register.IndexRegister;
 
 public class StackMemory {
 	private static final StackMemory sm = new StackMemory();

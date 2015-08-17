@@ -1,4 +1,4 @@
-package microprocessor.execution;
+package microprocessor.execution.register;
 
 public enum IndexRegister {
 	IP (0), SI(0), DI(0), SP(0), BP(0);

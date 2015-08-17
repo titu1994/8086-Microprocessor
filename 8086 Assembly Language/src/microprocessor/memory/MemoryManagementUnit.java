@@ -1,7 +1,8 @@
 package microprocessor.memory;
 
-import microprocessor.execution.ExtendedRegister;
-import microprocessor.execution.IndexRegister;
+import microprocessor.execution.register.ExtendedRegister;
+import microprocessor.execution.register.IndexRegister;
+import microprocessor.execution.register.SegmentRegister;
 
 public class MemoryManagementUnit {
 	private static final MemoryManagementUnit mmu = new MemoryManagementUnit();

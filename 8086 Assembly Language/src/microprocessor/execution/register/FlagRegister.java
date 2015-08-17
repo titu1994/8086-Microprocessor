@@ -1,4 +1,4 @@
-package microprocessor.execution;
+package microprocessor.execution.register;
 
 public enum FlagRegister {
 	PF(0), ZF(0), SF(0), AF(0), CF(0), OF(0), TF(0), IF(0), DF(0);

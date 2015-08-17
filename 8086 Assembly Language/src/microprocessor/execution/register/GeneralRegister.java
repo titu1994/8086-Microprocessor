@@ -1,4 +1,4 @@
-package microprocessor.execution;
+package microprocessor.execution.register;
 
 public enum GeneralRegister {
 	AH ((byte)0), AL ((byte)0), BH((byte)0), BL((byte)0), CH((byte)0), CL((byte)0), DH((byte)0), DL((byte)0);

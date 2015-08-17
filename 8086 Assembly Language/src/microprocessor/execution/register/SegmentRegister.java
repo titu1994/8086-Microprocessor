@@ -1,4 +1,6 @@
-package microprocessor.memory;
+package microprocessor.execution.register;
+
+import microprocessor.memory.Memory;
 
 public enum SegmentRegister {
 	SS (0),	CS (0),	ES (0), DS (0);

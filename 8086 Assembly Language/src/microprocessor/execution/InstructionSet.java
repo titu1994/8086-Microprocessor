@@ -1,11 +1,14 @@
 package microprocessor.execution;
 
+import microprocessor.execution.register.ExtendedRegister;
+import microprocessor.execution.register.GeneralRegister;
+import microprocessor.execution.register.IndexRegister;
+import microprocessor.execution.register.SegmentRegister;
 import microprocessor.memory.MemoryManagementUnit;
-import microprocessor.memory.SegmentRegister;
 
 
 public class InstructionSet {
-	
+
 	//General Purpose Data Transfer
 	/**
 	 * MOV MEMORY, AL
@@ -20,7 +23,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV MEMORY, AX
 	 * @param memLocation
@@ -34,7 +37,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AL, MEMORY
 	 * @param AX
@@ -47,7 +50,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AX, MEMORY (2 locations)
 	 * @param AX
@@ -60,7 +63,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV dstReg, srcReg
 	 * @param dest
@@ -73,7 +76,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AX,BX
 	 * @param dest
@@ -86,7 +89,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AX,BL
 	 * @param dest
@@ -99,7 +102,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AL, 1 Byte data
 	 * @param AL
@@ -112,7 +115,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AX, 1 Word data
 	 * @param AL
@@ -125,7 +128,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV [1000],1 Byte data
 	 * @param memoryLocation
@@ -138,7 +141,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV [1000], 1 Word Data
 	 * @param memoryLocation
@@ -151,7 +154,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV CS,AX
 	 * @param seg
@@ -164,7 +167,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV ES,[SI]
 	 * @param seg
@@ -177,7 +180,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV AX,DS
 	 * @param ex
@@ -190,7 +193,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * MOV [SI],ES
 	 * @param ix
@@ -203,7 +206,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * PUSH IP
 	 * @param ix
@@ -215,7 +218,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * PUSH AX
 	 * @param ex
@@ -227,7 +230,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * POP IP
 	 * @param ix
@@ -239,7 +242,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * POP AX
 	 * @param ex
@@ -251,7 +254,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XCHG AL,BL
 	 * @param dest
@@ -267,7 +270,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XCHG AX,BX
 	 * @param dest
@@ -283,7 +286,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XCHG IP,SI
 	 * @param dest
@@ -299,7 +302,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XCHG AX,SI
 	 * @param dest
@@ -315,7 +318,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XCHG SI,AX
 	 * @param dest
@@ -331,7 +334,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * XLAT
 	 * @return
@@ -344,7 +347,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * All Hardware accessing instructions are unsupported
 	 * @param al
@@ -354,7 +357,7 @@ public class InstructionSet {
 	public synchronized Instruction IN(GeneralRegister al, int port) {
 		throw new UnsupportedOperationException("All Hardware accessing instructions are unsupported");
 	}
-	
+
 	/**
 	 * All Hardware accessing instructions are unsupported
 	 * @param al
@@ -364,7 +367,7 @@ public class InstructionSet {
 	public synchronized Instruction IN(GeneralRegister al, ExtendedRegister ex) {
 		throw new UnsupportedOperationException("All Hardware accessing instructions are unsupported");
 	}
-	
+
 	/**
 	 * All Hardware accessing instructions are unsupported
 	 * @param port
@@ -374,7 +377,7 @@ public class InstructionSet {
 	public synchronized Instruction OUT(int port, GeneralRegister al) {
 		throw new UnsupportedOperationException("All Hardware accessing instructions are unsupported");
 	}
-	
+
 	/**
 	 * All Hardware accessing instructions are unsupported
 	 * @param ex
@@ -384,7 +387,7 @@ public class InstructionSet {
 	public synchronized Instruction OUT(ExtendedRegister ex, GeneralRegister al) {
 		throw new UnsupportedOperationException("All Hardware accessing instructions are unsupported");
 	}
-	
+
 	/**
 	 * LEA AX, count
 	 * @param ax
@@ -397,7 +400,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LEA SI, count
 	 * @param ix
@@ -410,7 +413,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LDS AX, count
 	 * @param ax
@@ -425,7 +428,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LDS SI, count
 	 * @param ix
@@ -440,7 +443,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LES AX, count
 	 * @param ax
@@ -455,7 +458,7 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LES SI, count
 	 * @param ix
@@ -470,50 +473,68 @@ public class InstructionSet {
 		});
 		return i;
 	}
-	
+
 	/**
 	 * LAFH
 	 * @return
 	 */
 	public synchronized Instruction LAHF() {
 		Instruction i = new Instruction("LAHF", () -> {
-		ArithmaticLogicalUnit.getALU().loadAHWithFlags();
+			ArithmaticLogicalUnit.getALU().loadAHWithFlags();
 		});
 		return i;
 	}
-	
+
 	/**
 	 * SAHF
 	 * @return
 	 */
 	public synchronized Instruction SAHF() {
 		Instruction i = new Instruction("SAHF", () -> {
-		ArithmaticLogicalUnit.getALU().storeAHWithFlags();
+			ArithmaticLogicalUnit.getALU().storeAHWithFlags();
 		});
 		return i;
 	}
-	
+
 	/**
 	 * POPF
 	 * @return
 	 */
 	public synchronized Instruction POPF() {
 		Instruction i = new Instruction("POPF", () -> {
-		ArithmaticLogicalUnit.getALU().popFlagFromStack();
+			ArithmaticLogicalUnit.getALU().popFlagFromStack();
 		});
 		return i;
 	}
-	
+
 	/**
 	 * PUSHF
 	 * @return
 	 */
 	public synchronized Instruction PUSHF() {
 		Instruction i = new Instruction("PUSHF", () -> {
-		ArithmaticLogicalUnit.getALU().pushFlagsOntoStack();
+			ArithmaticLogicalUnit.getALU().pushFlagsOntoStack();
 		});
 		return i;
 	}
+
+
+	//Logical Instructions
+	/**
+	 * Byte NOT
+	 * @param ax
+	 * @return
+	 */
+	public synchronized Instruction NOT(GeneralRegister ax) { 
+		Instruction i = new Instruction("NOT", () -> {
+			byte h = ax.getVal();
+			h = (byte) ~h;
+			ax.setVal(h);
+		});
+		return i;
+	}
+	
+	
 	
 	
 	
